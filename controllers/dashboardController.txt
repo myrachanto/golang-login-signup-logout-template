@@ -1,0 +1,53 @@
+package controllers
+
+
+import(
+	"net/http"
+	"log"
+	"bytes"
+	_"encoding/json"
+	"fmt"
+	"math/rand"
+	 s "github.com/myrachanto/asearch/models"
+)
+func DashboardHandler(w http.ResponseWriter, r *http.Request){
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	counter++
+	//fmt.Fprintf(w, "data: %v\n\n", counter)
+	//fmt.Printf("data: %v\n", counter)
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.Encode(<- dashboard)
+	fmt.Fprintf(w, "data: %v\n\n", buf.String() )
+	fmt.Printf("data: %v\n", buf)
+}
+func UpdateDashboard(){
+	for {
+		inv := UpdateInvetory()
+		db := &s.Dashboard{
+			Users: uint(rand.Uint32()),
+			UsersLoggedIn: uint(rand.Uint32() % 200),
+			Inventory: inv,
+		//db := &dashboard{}}
+		}
+		dashboard <- db
+	}
+	
+}
+func UpdateInvetory() *Store{
+	inv:= &Store{}
+	inv.Items = make(map[string]Item)
+	a:= Item{Name:"Books", Price:500, Quantity:int(rand.Int31()%50)}
+	inv.Items["books"] = a
+	a= Item{Name:"car", Price:1500000, Quantity:int(rand.Int31()%70)}
+	inv.Items["car"] = a
+	a= Item{Name:"jacket", Price:1000, Quantity:int(rand.Int31()%56)}
+	inv.Items["jacket"] = a
+	a= Item{Name:"Tshirt", Price:500, Quantity:int(rand.Int31()%59)}
+	inv.Items["tshirt"] = a
+	a= Item{Name:"Shoe", Price:1000, Quantity:int(rand.Int31()%100)}
+	inv.Items["shoe"] = a
+	return inv
+}
